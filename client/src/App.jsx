@@ -1,13 +1,14 @@
-import './App.css';
+import React from 'react';
+import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import {
   ApolloClient,
   InMemoryCache,
-  ApolloProvider,
+  ApolloProvider, 
   createHttpLink,
-} from '@apollo/client';
-import { setContext } from '@apollo/client/link/context';
-import { Outlet } from 'react-router-dom';
-
+} from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
+import SearchBooks from './pages/SearchBooks';
+import SavedBooks from './pages/SavedBooks';
 import Navbar from './components/Navbar';
 
 // Construct our main GraphQL API endpoint
@@ -36,13 +37,17 @@ const client = new ApolloClient({
 
 function App() {
   return (
-    <ApolloProvider client={client}>
-      <div className="flex-column justify-flex-start min-100-vh">
-        <Navbar />
-        <div className="container">
-          <Outlet />
-        </div>
-      </div>
+<ApolloProvider client={client}>
+      <Router>
+        <>
+          <Navbar />
+          <Switch>
+            <Route exact path='/' component={SearchBooks} />
+            <Route exact path='/saved' component={SavedBooks} />
+            <Route render={() => <h1 className='display-2'>Wrong page!</h1>} />
+          </Switch>
+        </>
+      </Router>
     </ApolloProvider>
   );
 }
