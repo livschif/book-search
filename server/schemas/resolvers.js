@@ -5,11 +5,7 @@ const resolvers = {
   Query: {
     me: async (parent, args, context) => {
       if (context.user) {
-        const userData = await User.findOne({ _id: context.user._id })
-          .select("-__v -password")
-          .populate("books");
-
-        return userData;
+        return User.findOne({ _id: context.user._id });
       }
       throw AuthenticationError;
     },
@@ -42,25 +38,22 @@ const resolvers = {
 
     saveBook: async (parent, { bookData }, context) => {
       if (context.user) {
-        const updatedUser = await User.findOneAndUpdate(
+        return User.findOneAndUpdate(
           { _id: context.user._id },
           { $addToSet: { saveBook: bookData } },
-          { new: true }
-        ).populate("books");
-        return updatedUser;
+          { new: true, runValidators: true }
+        );
       }
-      throw AuthenticationError;
-      ("You need to be logged in!");
+      throw new AuthenticationError;
     },
 
     removeBook: async (parent, { bookId }, context) => {
       if (context.user) {
-        const updatedUser = await User.findOneAndUpdate(
+        return User.findOneAndUpdate(
           { _id: context.user._id },
-          { $pull: { saveBook: bookId._id } },
+          { $pull: { saveBook: { bookId } } },
           { new: true }
         );
-        return updatedUser;
       }
       throw AuthenticationError;
     },
